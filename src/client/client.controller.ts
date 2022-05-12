@@ -1,40 +1,45 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+  Query,
 } from '@nestjs/common';
 import { ClientService } from './client.service';
+import { ClientDocument } from './schemas/schema';
 
-@Controller('client')
+@Controller('Clients')
 export class ClientController {
   constructor(private readonly clientService: ClientService) {}
 
   @Post()
-  create(@Body() createClientDto: any) {
-    return this.clientService.create(createClientDto);
+  createClients(@Body() client: ClientDocument): Promise<ClientDocument> {
+    return this.clientService.createClient(client);
   }
 
-  @Get()
-  findAll() {
-    return this.clientService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.clientService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateClientDto: any) {
-    return this.clientService.update(+id, updateClientDto);
+  @Put(':id')
+  updateClients(
+    @Param('id') id: string,
+    @Body() client: ClientDocument,
+  ): Promise<ClientDocument> {
+    return this.clientService.updateClient(id, client);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.clientService.remove(+id);
+  deleteClient(@Param('id') id: string): Promise<any> {
+    return this.clientService.deleteClient(id);
+  }
+
+  @Get(':id')
+  getClient(@Param('id') id: string): Promise<ClientDocument> {
+    return this.clientService.getClient(id);
+  }
+
+  @Get()
+  getClients(): Promise<ClientDocument[]> {
+    return this.clientService.getClients();
   }
 }

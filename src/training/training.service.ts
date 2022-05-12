@@ -1,24 +1,59 @@
+import { Training } from './interface/training.interface';
+import { Model } from 'mongoose';
+import { InjectModel } from '@nestjs/mongoose';
 import { Injectable } from '@nestjs/common';
+import { Training as TrainingSchema, TrainingDocument } from './schemas/schema';
 
 @Injectable()
 export class TrainingService {
-  create(createTrainingDto: any) {
-    return 'This action adds a new training';
+  constructor(
+    @InjectModel(TrainingSchema.name)
+    private trainingModel: Model<TrainingDocument>,
+  ) {}
+
+  getTraining(id: string): Promise<TrainingDocument> {
+    return this.trainingModel.findById(id).exec();
   }
 
-  findAll() {
-    return `This action returns all training`;
+  async getTrainings(
+    page: number,
+    size: number,
+    code?: string,
+    name?: string,
+  ): Promise<TrainingDocument[]> {
+    const query = {
+      name: name ? { $regex: name, $options: 'i' } : undefined,
+      code: code ? { $regex: code, $options: 'i' } : undefined,
+    };
+    if (!name) delete query.name;
+    if (!code) delete query.code;
+    return this.trainingModel
+      .find(query)
+      .skip((page - 1) * size)
+      .limit(size)
+      .exec();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} training`;
+  async countTrainings(code?: string, name?: string): Promise<number> {
+    const query = {
+      name: name ? { $regex: name, $options: 'i' } : undefined,
+      code: code ? { $regex: code, $options: 'i' } : undefined,
+    };
+    if (!name) delete query.name;
+    if (!code) delete query.code;
+    return this.trainingModel.find(query).count().exec();
   }
 
-  update(id: number, updateTrainingDto: any) {
-    return `This action updates a #${id} training`;
+  async createTraining(training: Training): Promise<TrainingDocument> {
+    const newTraining = new this.trainingModel(training);
+    return newTraining.save();
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} training`;
+  async updateTraining(id: string, training: Training): Promise<any> {
+    return this.trainingModel.updateOne({ _id: id }, training).exec();
+  }
+
+  async deleteTraining(id: string): Promise<any> {
+    return this.trainingModel.deleteOne({ _id: id }).exec();
   }
 }

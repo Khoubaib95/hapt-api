@@ -12,7 +12,13 @@ export const getEntryPointHello: getHello = {
   contact: 'contact@hapt.com " NOT YET SUPPORTED "',
 };
 // JWT Constants
-export const jwtConstants = {
+/*export const jwtConstants = {
   jwt_secret: process.env.JWT_SECRET,
+  jwt_life: process.env.JWT_LIFE,
+};
+
+*/
+export const jwtConstants = {
+  jwt_secret: 'haG(5pbg<Xp3tz&o0+d£h,8r?tzo$cgn/yWxWz',
   jwt_life: '8h',
 };

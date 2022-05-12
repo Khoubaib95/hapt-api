@@ -1,24 +1,56 @@
+import { Session } from './interface/session.interface';
+import { Model } from 'mongoose';
+import { InjectModel } from '@nestjs/mongoose';
 import { Injectable } from '@nestjs/common';
+import { Session as Sessionschema, SessionDocument } from './schemas/schema';
 
 @Injectable()
 export class SessionService {
-  create(createSessionDto: any) {
-    return 'This action adds a new session';
+  constructor(
+    @InjectModel(Sessionschema.name)
+    private SessionModel: Model<SessionDocument>,
+  ) {}
+
+  getSession(id: string): Promise<SessionDocument> {
+    return this.SessionModel.findById(id).exec();
   }
 
-  findAll() {
-    return `This action returns all session`;
+  async getSessions(
+    page: number,
+    size: number,
+
+    session?: string,
+  ): Promise<SessionDocument[]> {
+    const query = {
+      session: session ? { $regex: session, $options: 'i' } : undefined,
+    };
+    if (!session) delete query.session;
+
+    return this.SessionModel.find(query)
+      .skip((page - 1) * size)
+      .limit(size)
+      .populate(['training', 'instructor', 'students'])
+      .exec();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} session`;
+  async countSessions(session?: string): Promise<number> {
+    const query = {
+      session: session ? { $regex: session, $options: 'i' } : undefined,
+    };
+    if (!session) delete query.session;
+    return this.SessionModel.find(query).count().exec();
   }
 
-  update(id: number, updateSessionDto: any) {
-    return `This action updates a #${id} session`;
+  async createSession(Session: Session): Promise<SessionDocument> {
+    const newSession = new this.SessionModel(Session);
+    return newSession.save();
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} session`;
+  async updateSession(id: string, Session: Session): Promise<any> {
+    return this.SessionModel.updateOne({ _id: id }, Session).exec();
+  }
+
+  async deleteSession(id: string): Promise<any> {
+    return this.SessionModel.deleteOne({ _id: id }).exec();
   }
 }

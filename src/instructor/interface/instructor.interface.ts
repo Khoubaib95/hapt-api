@@ -1,19 +1,6 @@
-import { Lead } from '../../lead/inteface/lead.interface';
+import { GenderType, UidType } from 'src/client/interface/client.interface';
 
-export enum UidType {
-  CIN = 0,
-  PASSPORT = 1,
-  DRIVER_LICE = 2,
-  MAT_FISC = 3,
-  OTHER = 4,
-}
-
-export enum GenderType {
-  MALE = 'm',
-  FEMALE = 'f',
-}
-
-export interface Client extends Lead {
+export interface Instructor {
   fullname: string;
   uid: {
     value: string;
@@ -21,9 +8,16 @@ export interface Client extends Lead {
   };
   gender?: GenderType;
   birthdate?: Date;
+  phone: string;
+  email: string;
   scolar: {
     level: number;
     diploma?: string;
+  };
+  job: {
+    title: string;
+    place: string;
+    exp: string;
   };
   note?: string;
   address: {
